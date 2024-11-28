@@ -10,3 +10,4 @@ Cybersecurity and data privacy 2024
 | 7.11.2024  | 2h  | Protecting the Organization<br>Will Your Future Be in Cybersecurity? | Module 4 done :white_check_mark:<br>Module 5 done :white_check_mark: |
 | 7.11.2024  | 1h  | Introduction to Cybersecurity: Course Final Exam | Final Exam done :white_check_mark: |
 | 14.11.2024  | 5h  | PortSwigger: SQL injection<br>PortSwigger: Authentication<br>PortSwigger: Access control | Lab: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data :white_check_mark:<br>Lab: Username enumeration via different responses :white_check_mark:<br>Lab: Unprotected admin functionality :white_check_mark:|
+| 22.11.2024<br>23.11.2024  | 13h  | The Booking system project | Phase 1 Done :white_check_mark:|
