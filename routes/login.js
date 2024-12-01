@@ -1,37 +1,64 @@
-// routes/login.js
 import client from "../db/db.js";
-import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts"; // For password comparison
+import { z } from "https://deno.land/x/zod@v3.16.1/mod.ts"; // For validation
+
+// Zod schema for login validation
+const loginSchema = z.object({
+    username: z.string().email({ message: "Invalid email address" }),
+	password: z.string().min(8, "Invalid email or password"),
+});
+
+// Log the successful login
+async function logLogin(userUUID, ipAddress) {
+    try {
+        await client.queryArray(`INSERT INTO login_logs (user_token, ip_address) VALUES ($1, $2)`, [userUUID, ipAddress]);
+    } catch (error) {
+        console.error("Error logging login event:", error);
+    }
+}
+
+// Helper function to fetch the user by email
+async function getUserByEmail(email) {
+    const result = await client.queryArray(`SELECT username, password_hash, user_token, role FROM zephyr_users WHERE username = $1`, [email]);
+    return result.rows.length > 0 ? result.rows[0] : null;
+}
 
 // Handle user login
-export async function loginUser(c) {
-    const body = await c.req.parseBody();
-    const username = body.username;
-    const password = body.password;
-
+export async function loginUser(c, info) {
+    const username = c.get('username');
+    const password = c.get('password');
     try {
-        // Fetch user by username (email)
-        const result = await client.queryArray(
-            `SELECT password_hash FROM zephyr_users WHERE username = $1`,
-            [username]
-        );
+        // Validate the input data using Zod
+        loginSchema.parse({ username, password });
 
-        if (result.rows.length === 0) {
-            return c.text('Invalid username or password', 401);
+        // Fetch the user by email
+        const user = await getUserByEmail(username);
+        if (!user) {
+            return new Response("Invalid email or password", { status: 400 });
         }
 
-        const [hashedPassword] = result.rows[0];
+        const [storedUsername, storedPasswordHash, userUUID] = user;
 
-        // Compare provided password with stored hash
-        const isValidPassword = await bcrypt.compare(password, hashedPassword);
-
-        if (!isValidPassword) {
-            return c.text('Invalid username or password', 401);
+        // Compare provided password with the stored hashed password
+        const passwordMatches = await bcrypt.compare(password, storedPasswordHash);
+        if (!passwordMatches) {
+            return new Response("Invalid email or password", { status: 400 });
         }
 
-        // Success response
-        return c.text('Login successful!');
+        // Log successful login
+        const ipAddress = info.remoteAddr.hostname;
+        await logLogin(userUUID, ipAddress);
+
+        // Authentication successful, redirect to the index page
+        return new Response(null, { status: 302, headers: {Location: "/", }, });
+
+
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Handle validation errors from Zod
+            return new Response(`Validation Error: ${error.errors.map(e => e.message).join(", ")}`, { status: 400 });
+        }
         console.error(error);
-        return c.text('Error during login', 500);
+        return new Response("Error during login", { status: 500 });
     }
 }
