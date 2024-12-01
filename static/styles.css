@@ -4,19 +4,51 @@ body {
     background-color: #f4f4f9;
     margin: 0;
     padding: 0;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
+/* Container for the content */
+.container {
+    text-align: center;
+}
+
+/* Header Style */
 h1 {
     color: #333;
-    text-align: center;
     margin-bottom: 20px;
 }
 
-/* Form Container */
+/* Navigation Styles */
+nav ul {
+    list-style-type: none; /* Removes bullet points */
+    padding: 0; /* Removes padding */
+    margin: 0; /* Removes default margin */
+}
+
+nav ul li {
+    margin: 10px 0; /* Adds vertical spacing between links */
+}
+
+nav ul li a {
+    color: #007BFF;
+    font-size: 18px;
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid #007BFF;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+/* Form Container Styles (For other pages) */
 form {
     background: #ffffff;
     padding: 20px 40px;
@@ -58,7 +90,7 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* Links and Additional Styles */
+/* Links in Forms */
 a {
     color: #007BFF;
     text-decoration: none;
